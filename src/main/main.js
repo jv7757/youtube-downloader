@@ -181,7 +181,8 @@ ipcMain.handle('download-video', async (event, { url, resolution, format }) => {
       '--merge-output-format',
       format,
       '-o',
-      path.join(settings.downloadPath, '%(title)s.%(ext)s')
+      path.join(settings.downloadPath, '%(title)s.%(ext)s'),
+      '--newline'
     ];
 
     if (settings.proxyUrl) {
@@ -193,28 +194,113 @@ ipcMain.handle('download-video', async (event, { url, resolution, format }) => {
     downloadProcess = spawn(settings.ytdlpPath, args);
 
     let errorOutput = '';
+    let downloadStage = 0; // 0: 视频, 1: 音频, 2: 合并
+    let maxProgress = 0; // 追踪最大进度，确保不回退
+
+    const calculateTotalProgress = (stageProgress) => {
+      // 分配权重：视频45%，音频45%，合并10%
+      if (downloadStage === 0) {
+        // 视频阶段：0-45%
+        return stageProgress * 0.45;
+      } else if (downloadStage === 1) {
+        // 音频阶段：45-90%
+        return 45 + stageProgress * 0.45;
+      } else {
+        // 合并阶段：90-100%
+        return 90 + stageProgress * 0.10;
+      }
+    };
+
+    const processOutput = (data) => {
+      const output = data.toString();
+      const lines = output.split('\n');
+
+      for (const line of lines) {
+        // 检测下载阶段
+        if (line.includes('[download] Destination:') || line.includes('Downloading video')) {
+          if (downloadStage === 0) {
+            // 第一次是视频
+            downloadStage = 0;
+          } else if (downloadStage === 0 && maxProgress > 40) {
+            // 如果视频下载已经过了40%，下一个Destination就是音频
+            downloadStage = 1;
+          }
+        } else if (line.includes('[download]') && line.includes('has already been downloaded')) {
+          // 文件已存在，跳到下一阶段
+          if (downloadStage === 0) {
+            maxProgress = Math.max(maxProgress, 45);
+            event.sender.send('download-progress', 45);
+            downloadStage = 1;
+          } else if (downloadStage === 1) {
+            maxProgress = Math.max(maxProgress, 90);
+            event.sender.send('download-progress', 90);
+            downloadStage = 2;
+          }
+        } else if (line.includes('[Merger]') || line.includes('Merging formats')) {
+          // 合并阶段
+          downloadStage = 2;
+          maxProgress = Math.max(maxProgress, 90);
+          event.sender.send('download-progress', 90);
+        } else if (line.includes('Deleting original file') || line.includes('[ExtractAudio]')) {
+          // 后处理阶段
+          downloadStage = 2;
+          const progress = 95;
+          if (progress > maxProgress) {
+            maxProgress = progress;
+            event.sender.send('download-progress', progress);
+          }
+        }
+
+        // 提取进度百分比
+        const match = line.match(/\[download\]\s+(\d+\.?\d*)%/);
+        if (match) {
+          const stageProgress = parseFloat(match[1]);
+          const totalProgress = calculateTotalProgress(stageProgress);
+
+          // 确保进度只增不减
+          if (totalProgress > maxProgress) {
+            maxProgress = totalProgress;
+            event.sender.send('download-progress', totalProgress);
+          }
+        }
+
+        // 检测下载完成（当前阶段）
+        if (line.includes('[download] 100%') || line.match(/\[download\]\s+100\.0%/)) {
+          if (downloadStage === 0) {
+            // 视频下载完成，准备下载音频
+            const progress = 45;
+            if (progress > maxProgress) {
+              maxProgress = progress;
+              event.sender.send('download-progress', progress);
+            }
+            downloadStage = 1;
+          } else if (downloadStage === 1) {
+            // 音频下载完成，准备合并
+            const progress = 90;
+            if (progress > maxProgress) {
+              maxProgress = progress;
+              event.sender.send('download-progress', progress);
+            }
+            downloadStage = 2;
+          }
+        }
+      }
+    };
 
     downloadProcess.stdout.on('data', (data) => {
-      const output = data.toString();
-      const match = output.match(/(\d+\.?\d*)%/);
-      if (match) {
-        event.sender.send('download-progress', parseFloat(match[1]));
-      }
+      processOutput(data);
     });
 
     downloadProcess.stderr.on('data', (data) => {
-      const output = data.toString();
-      errorOutput += output;
-
-      const match = output.match(/(\d+\.?\d*)%/);
-      if (match) {
-        event.sender.send('download-progress', parseFloat(match[1]));
-      }
+      errorOutput += data.toString();
+      processOutput(data);
     });
 
     downloadProcess.on('close', (code) => {
       downloadProcess = null;
       if (code === 0) {
+        // 确保进度达到100%
+        event.sender.send('download-progress', 100);
         resolve({ success: true, path: settings.downloadPath });
       } else {
         reject(new Error(errorOutput || 'Download failed'));
