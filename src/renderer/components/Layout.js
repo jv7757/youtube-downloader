@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/Layout.css';
 
-function Layout({ children }) {
+function Layout({ children, theme, toggleTheme }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -33,6 +33,10 @@ function Layout({ children }) {
         </ul>
 
         <div className="sidebar-footer">
+          <button className="theme-toggle" onClick={toggleTheme} title="切换主题">
+            <span className="theme-icon">{theme === 'light' ? '🌙' : '☀️'}</span>
+            <span className="theme-label">{theme === 'light' ? '黑暗模式' : '明亮模式'}</span>
+          </button>
           <div className="version">v1.0.0</div>
         </div>
       </nav>

@@ -4,10 +4,30 @@
   box-sizing: border-box;
 }
 
+/* 明亮主题（默认） */
 :root {
   --primary-color: #ff0000;
   --primary-hover: #cc0000;
-  --secondary-color: #282828;
+  --secondary-color: #606060;
+  --background: #f5f5f5;
+  --surface: #ffffff;
+  --surface-hover: #f8f8f8;
+  --text-primary: #202020;
+  --text-secondary: #606060;
+  --border-color: #e0e0e0;
+  --success-color: #00c853;
+  --error-color: #ff1744;
+  --warning-color: #ff9800;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 黑暗主题 */
+[data-theme="dark"] {
+  --primary-color: #ff0000;
+  --primary-hover: #cc0000;
+  --secondary-color: #505050;
   --background: #0f0f0f;
   --surface: #1a1a1a;
   --surface-hover: #2a2a2a;
@@ -18,7 +38,7 @@
   --error-color: #ff1744;
   --warning-color: #ffc107;
   --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
 body {
@@ -138,7 +158,9 @@ body {
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--surface-hover);
+  background: #505050;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
 }
 
 .btn-success {

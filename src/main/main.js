@@ -53,7 +53,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js')
     },
     frame: true,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#f5f5f5',
     show: false
   });
 
