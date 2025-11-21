@@ -1,0 +1,232 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary-color: #ff0000;
+  --primary-hover: #cc0000;
+  --secondary-color: #282828;
+  --background: #0f0f0f;
+  --surface: #1a1a1a;
+  --surface-hover: #2a2a2a;
+  --text-primary: #ffffff;
+  --text-secondary: #aaaaaa;
+  --border-color: #303030;
+  --success-color: #00c853;
+  --error-color: #ff1744;
+  --warning-color: #ffc107;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  background: var(--background);
+  color: var(--text-primary);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.slide-in {
+  animation: slideIn 0.4s ease-out;
+}
+
+/* Common Components */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  outline: none;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.btn-secondary {
+  background: var(--secondary-color);
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--surface-hover);
+}
+
+.btn-success {
+  background: var(--success-color);
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #00a844;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+.btn-danger {
+  background: var(--error-color);
+  color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #d50032;
+}
+
+.btn-large {
+  padding: 14px 32px;
+  font-size: 16px;
+}
+
+.btn.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.btn-icon {
+  font-size: 18px;
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: var(--transition);
+  outline: none;
+}
+
+.input:focus,
+.select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.1);
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+}
+
+.alert {
+  padding: 14px 18px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.alert-icon {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.alert-success {
+  background: rgba(0, 200, 83, 0.15);
+  color: var(--success-color);
+  border: 1px solid rgba(0, 200, 83, 0.3);
+}
+
+.alert-error {
+  background: rgba(255, 23, 68, 0.15);
+  color: var(--error-color);
+  border: 1px solid rgba(255, 23, 68, 0.3);
+}
+
+.alert-warning {
+  background: rgba(255, 193, 7, 0.15);
+  color: var(--warning-color);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
