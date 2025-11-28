@@ -74,13 +74,34 @@ npm install
 npm run dev
 ```
 
-### 4. 构建生产版本
+### 4. 添加应用图标（可选）
+
+为了让应用有自定义图标，需要准备图标文件：
+
+```bash
+# 1. 准备一个 1024x1024 的 PNG 图标，保存为 assets/icon.png
+
+# 2. 转换为平台特定格式
+# macOS 用户可以运行：
+./scripts/generate-icons-macos.sh
+
+# 或使用在线工具：
+# - Windows (.ico): https://icoconvert.com/
+# - macOS (.icns): https://cloudconvert.com/png-to-icns
+
+# 3. 检查图标状态
+node scripts/generate-icons.js
+```
+
+详细说明请查看 `assets/README.md`
+
+### 5. 构建生产版本
 
 ```bash
 npm run build
 ```
 
-### 5. 打包应用
+### 6. 打包应用
 
 ```bash
 # 打包所有平台

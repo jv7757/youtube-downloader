@@ -30,9 +30,27 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
-        # postinstall will automatically download yt-dlp binaries
+      - name: Configure Git Bash (Windows)
+        if: matrix.platform == 'win'
+        run: npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
+
+      - name: Install dependencies (with retry)
+        uses: nick-fields/retry-action@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_wait_seconds: 30
+          command: npm ci
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+
+      - name: Install Electron binary (with retry)
+        uses: nick-fields/retry-action@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          retry_wait_seconds: 30
+          command: npx electron@latest install
 
       - name: Build application
         run: npm run build

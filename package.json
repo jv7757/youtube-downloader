@@ -66,11 +66,11 @@
     ],
     "win": {
       "target": ["nsis"],
-      "icon": "assets/icon.png"
+      "icon": "assets/icon.ico"
     },
     "mac": {
       "target": ["dmg"],
-      "icon": "assets/icon.png",
+      "icon": "assets/icon.icns",
       "category": "public.app-category.utilities",
       "identity": null
     },
