@@ -9,12 +9,50 @@ let downloadProcess = null;
 
 const settingsPath = path.join(app.getPath('userData'), 'settings.json');
 
+// 获取打包的 yt-dlp 路径
+function getBundledYtdlpPath() {
+  // 判断是否在开发模式
+  const isDev = !app.isPackaged;
+
+  if (isDev) {
+    // 开发模式：尝试使用项目中的 yt-dlp
+    const platform = process.platform;
+    let devPath;
+
+    if (platform === 'win32') {
+      devPath = path.join(__dirname, '../../resources/bin/win/yt-dlp.exe');
+    } else if (platform === 'darwin') {
+      devPath = path.join(__dirname, '../../resources/bin/mac/yt-dlp');
+    } else {
+      devPath = path.join(__dirname, '../../resources/bin/linux/yt-dlp');
+    }
+
+    // 如果开发模式下存在打包的版本，使用它；否则使用系统的 yt-dlp
+    if (fs.existsSync(devPath)) {
+      return devPath;
+    }
+    return 'yt-dlp'; // 使用系统 PATH 中的 yt-dlp
+  }
+
+  // 生产模式：使用打包的 yt-dlp
+  const platform = process.platform;
+  const resourcesPath = process.resourcesPath;
+
+  if (platform === 'win32') {
+    return path.join(resourcesPath, 'bin/win/yt-dlp.exe');
+  } else if (platform === 'darwin') {
+    return path.join(resourcesPath, 'bin/mac/yt-dlp');
+  } else {
+    return path.join(resourcesPath, 'bin/linux/yt-dlp');
+  }
+}
+
 // 默认设置
 const defaultSettings = {
   defaultResolution: '1080p',
   downloadPath: path.join(app.getPath('downloads'), 'YouTube'),
   proxyUrl: '',
-  ytdlpPath: 'yt-dlp'
+  ytdlpPath: getBundledYtdlpPath()
 };
 
 // 读取设置
@@ -22,7 +60,14 @@ function loadSettings() {
   try {
     if (fs.existsSync(settingsPath)) {
       const data = fs.readFileSync(settingsPath, 'utf8');
-      return { ...defaultSettings, ...JSON.parse(data) };
+      const savedSettings = JSON.parse(data);
+
+      // 如果保存的设置中没有 ytdlpPath 或者是默认的 'yt-dlp'，使用打包的版本
+      if (!savedSettings.ytdlpPath || savedSettings.ytdlpPath === 'yt-dlp') {
+        savedSettings.ytdlpPath = getBundledYtdlpPath();
+      }
+
+      return { ...defaultSettings, ...savedSettings };
     }
   } catch (error) {
     console.error('Error loading settings:', error);

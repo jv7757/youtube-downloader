@@ -1,6 +1,6 @@
 # YouTube Downloader
 
-一个现代化的 YouTube 视频下载器，基于 Electron + React + yt-dlp 构建，支持跨平台使用。
+一个简洁现代化的 YouTube 视频下载器，基于 Electron 支持跨平台使用。
 
 ## 功能特性
 
@@ -32,7 +32,7 @@
      ```bash
      # 使用 pip
      pip install yt-dlp
-
+     
      # 或使用 homebrew (macOS)
      brew install yt-dlp
      ```
@@ -41,7 +41,7 @@
      ```bash
      # 使用 pip
      pip install yt-dlp
-
+     
      # 或下载可执行文件
      # https://github.com/yt-dlp/yt-dlp/releases
      ```

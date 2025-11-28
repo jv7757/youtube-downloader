@@ -11,7 +11,9 @@
     "dist": "electron-builder",
     "dist:win": "electron-builder --win",
     "dist:mac": "electron-builder --mac",
-    "dist:linux": "electron-builder --linux"
+    "dist:linux": "electron-builder --linux",
+    "download:ytdlp": "node scripts/download-ytdlp.js",
+    "postinstall": "node scripts/download-ytdlp.js"
   },
   "keywords": ["youtube", "downloader", "yt-dlp", "electron", "react"],
   "author": "",
@@ -45,6 +47,23 @@
       "node_modules/**/*",
       "package.json"
     ],
+    "extraResources": [
+      {
+        "from": "resources/bin/win",
+        "to": "bin/win",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "resources/bin/mac",
+        "to": "bin/mac",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "resources/bin/linux",
+        "to": "bin/linux",
+        "filter": ["**/*"]
+      }
+    ],
     "win": {
       "target": ["nsis"],
       "icon": "assets/icon.png"
@@ -52,7 +71,8 @@
     "mac": {
       "target": ["dmg"],
       "icon": "assets/icon.png",
-      "category": "public.app-category.utilities"
+      "category": "public.app-category.utilities",
+      "identity": null
     },
     "linux": {
       "target": ["AppImage", "deb"],

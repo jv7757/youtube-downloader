@@ -4,3 +4,7 @@ release/
 *.log
 .DS_Store
 .env
+
+# yt-dlp binaries (currently tracked for easier distribution)
+# Uncomment the following line if you want to exclude binaries from git:
+# resources/bin/
