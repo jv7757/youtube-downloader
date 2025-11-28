@@ -37,42 +37,29 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: |
-          # Retry logic for npm ci
-          for i in 1 2 3; do
-            echo "Attempt $i of 3..."
-            if npm ci; then
-              echo "npm ci succeeded"
-              break
-            else
-              if [ $i -eq 3 ]; then
-                echo "npm ci failed after 3 attempts"
-                exit 1
-              fi
-              echo "Retrying in 30 seconds..."
-              sleep 30
-            fi
-          done
-        env:
-          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+          # Set longer npm timeout
+          npm config set fetch-timeout 600000
+          npm config set fetch-retry-mintimeout 20000
+          npm config set fetch-retry-maxtimeout 120000
 
-      - name: Install Electron binary
-        shell: bash
-        run: |
-          # Retry logic for Electron install
+          # Retry logic for npm ci with all dependencies including Electron
           for i in 1 2 3; do
             echo "Attempt $i of 3..."
-            if npx electron@latest install; then
-              echo "Electron install succeeded"
+            echo "Installing all dependencies (this may take several minutes)..."
+
+            if npm ci --prefer-offline --no-audit; then
+              echo "✓ npm ci succeeded"
               break
             else
               if [ $i -eq 3 ]; then
-                echo "Electron install failed after 3 attempts"
+                echo "✗ npm ci failed after 3 attempts"
                 exit 1
               fi
               echo "Retrying in 30 seconds..."
               sleep 30
             fi
           done
+        timeout-minutes: 20
 
       - name: Build application
         run: npm run build
