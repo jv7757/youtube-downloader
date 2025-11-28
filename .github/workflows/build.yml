@@ -34,23 +34,45 @@ jobs:
         if: matrix.platform == 'win'
         run: npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
 
-      - name: Install dependencies (with retry)
-        uses: nick-fields/retry-action@v2
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          retry_wait_seconds: 30
-          command: npm ci
+      - name: Install dependencies
+        shell: bash
+        run: |
+          # Retry logic for npm ci
+          for i in 1 2 3; do
+            echo "Attempt $i of 3..."
+            if npm ci; then
+              echo "npm ci succeeded"
+              break
+            else
+              if [ $i -eq 3 ]; then
+                echo "npm ci failed after 3 attempts"
+                exit 1
+              fi
+              echo "Retrying in 30 seconds..."
+              sleep 30
+            fi
+          done
         env:
           ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
 
-      - name: Install Electron binary (with retry)
-        uses: nick-fields/retry-action@v2
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          retry_wait_seconds: 30
-          command: npx electron@latest install
+      - name: Install Electron binary
+        shell: bash
+        run: |
+          # Retry logic for Electron install
+          for i in 1 2 3; do
+            echo "Attempt $i of 3..."
+            if npx electron@latest install; then
+              echo "Electron install succeeded"
+              break
+            else
+              if [ $i -eq 3 ]; then
+                echo "Electron install failed after 3 attempts"
+                exit 1
+              fi
+              echo "Retrying in 30 seconds..."
+              sleep 30
+            fi
+          done
 
       - name: Build application
         run: npm run build

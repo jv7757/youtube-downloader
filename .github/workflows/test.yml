@@ -35,13 +35,45 @@ jobs:
         run: npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
 
       - name: Install dependencies
-        run: npm ci
+        shell: bash
+        run: |
+          # Simple retry for npm ci
+          for i in 1 2 3; do
+            echo "Attempt $i of 3..."
+            if npm ci; then
+              echo "npm ci succeeded"
+              break
+            else
+              if [ $i -eq 3 ]; then
+                echo "npm ci failed after 3 attempts"
+                exit 1
+              fi
+              echo "Retrying in 30 seconds..."
+              sleep 30
+            fi
+          done
         env:
           ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
         timeout-minutes: 10
 
       - name: Install Electron binary
-        run: npx electron@latest install
+        shell: bash
+        run: |
+          # Simple retry for Electron install
+          for i in 1 2 3; do
+            echo "Attempt $i of 3..."
+            if npx electron@latest install; then
+              echo "Electron install succeeded"
+              break
+            else
+              if [ $i -eq 3 ]; then
+                echo "Electron install failed after 3 attempts"
+                exit 1
+              fi
+              echo "Retrying in 30 seconds..."
+              sleep 30
+            fi
+          done
         timeout-minutes: 10
 
       - name: Build webpack bundles

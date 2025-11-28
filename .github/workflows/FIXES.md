@@ -17,10 +17,23 @@
 **问题**: 网络波动导致间歇性失败
 
 **修复**:
-- ✅ 使用 `nick-fields/retry-action@v2`
+- ✅ 使用内置 shell 脚本重试逻辑（无第三方依赖）
 - ✅ 最多重试 3 次
 - ✅ 每次重试间隔 30 秒
 - ✅ 超时时间 10 分钟
+- ✅ 跨平台兼容（使用 bash shell）
+
+**重试逻辑示例**:
+```bash
+for i in 1 2 3; do
+  if npm ci; then
+    break
+  else
+    if [ $i -eq 3 ]; then exit 1; fi
+    sleep 30
+  fi
+done
+```
 
 ### 3. npm 配置优化
 
