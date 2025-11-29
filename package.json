@@ -69,10 +69,25 @@
       "icon": "assets/icon.ico"
     },
     "mac": {
-      "target": ["dmg"],
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64", "arm64"]
+        }
+      ],
       "icon": "assets/icon.icns",
       "category": "public.app-category.utilities",
-      "identity": null
+      "identity": null,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "writeUpdateInfo": false,
+      "sign": false
     },
     "linux": {
       "target": ["AppImage", "deb"],
